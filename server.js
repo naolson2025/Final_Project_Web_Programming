@@ -10,6 +10,7 @@ app.use(express.static(path.join(__dirname, 'client', 'dist')));
 
 app.use(bodyParser.json());
 
+// http://127.0.0.1:3000/api/transactions
 app.use('/api', transactions_api);
 
 // error handlers
