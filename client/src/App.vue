@@ -7,7 +7,7 @@
       <div class="row">
         <div class="col-md-6">
           <h2>Income</h2>
-          <IncomeGraph></IncomeGraph>
+            <IncomeGraph></IncomeGraph>
         </div>
 
         <div class="col-md-6">
@@ -21,6 +21,7 @@
 </template>
 
 <script>
+    // tutorial found https://vue-chartjs.org/guide/#chart-with-api-data
   import Header from "@/components/Header";
   import Footer from "@/components/Footer";
   import IncomeGraph from "./components/IncomeGraph";
