@@ -9,7 +9,7 @@
           <h2>Income</h2>
             <IncomeGraph v-if="dataLoaded" v-bind:chartData="incomeChartData" v-bind:options="options"></IncomeGraph>
 
-            <div>
+            <div class="input-group">
               <input v-model.trim="newTransactionDescription" placeholder="Description">
               <input type="number" v-model.number="newTransactionAmount" placeholder="Amount">
               <button v-on:click="addTransaction">Add Transaction</button>
@@ -79,17 +79,17 @@
       },
       addTransaction(){
         // error handling for empty boxes
-        if (!this.newTransactionDescription || !this.newtransactionAmount){
-          alert("Enter description and amount")
+        if (!this.newTransactionDescription || !this.newTransactionAmount){
+          alert("Enter description and amount");
+        }else {
+          this.$transactionService.addTransaction({ description: this.newTransactionDescription, amount: this.newTransactionAmount})
+                  .then(response => {
+                    this.newTransactionDescription = "";
+                    this.newTransactionAmount = "";
+                    this.loadChartData()
+                  })
+                  .catch(err => console.error(err))
         }
-
-        this.$transactionService.addTransaction({ description: this.newTransactionDescription, amount: this.newTransactionAmount})
-                .then(response => {
-                  this.newTransactionDescription = "";
-                  this.newTransactionAmount = "";
-                  this.loadChartData()
-                })
-                .catch(err => console.error(err))
       },
       backgroundColor(number){
         const colors = ['#C0392B', '#E74C3C', '#9B59B6', '#8E44AD', '#2980B9', '#3498DB', '#1ABC9C', '#16A085', '#27AE60', '#2ECC71', '#F1C40F', '#F39C12', '#E67E2', '#D35400'];
@@ -115,5 +115,8 @@
     text-align: center;
     color: #2c3e50;
     margin-top: 60px;
+  }
+  .input-group{
+    padding-top: 50px;
   }
 </style>
