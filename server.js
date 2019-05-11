@@ -24,10 +24,6 @@ app.use(function (err, req, res, next) {
     res.status(500).send('Server error')
 });
 
-// app.get('/', function(req,res){
-//     res.send("Welcome to Invoicing App");
-// });
-
 // Start server running
 var server = app.listen(process.env.PORT || 3000, function () {
     console.log('app running on port', server.address().port)

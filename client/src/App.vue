@@ -18,24 +18,22 @@
 
         <div class="col-md-6">
           <h2>Expenses</h2>
-          <ExpenseGraph v-if="dataLoaded" v-bind:chartData="incomeChartData" v-bind:options="options"></ExpenseGraph>
+          <ExpenseGraph v-if="dataLoaded" v-bind:chartData="expenseChartData" v-bind:options="options"></ExpenseGraph>
 
           <div class="input-group">
-            <input v-model.trim="newIncomeTransactionDescription" placeholder="Description">
-            <input type="number" v-model.number="newIncomeTransactionAmount" placeholder="Amount">
-            <button v-on:click="addIncomeTransaction">Add Transaction</button>
+            <input v-model.trim="newExpenseTransactionDescription" placeholder="Description">
+            <input type="number" v-model.number="newExpenseTransactionAmount" placeholder="Amount">
+            <button v-on:click="addExpenseTransaction">Add Transaction</button>
           </div>
         </div>
       </div>
     </div>
-    <Footer></Footer>
   </div>
 </template>
 
 <script>
     // tutorial found https://vue-chartjs.org/guide/#chart-with-api-data
   import Header from "@/components/Header";
-  import Footer from "@/components/Footer";
   import IncomeGraph from "./components/IncomeGraph.vue";
   import ExpenseGraph from "./components/ExpenseGraph.vue";
 
@@ -45,7 +43,6 @@
       ExpenseGraph,
       IncomeGraph,
       Header,
-      Footer
     },
     data(){
       return {
@@ -54,7 +51,12 @@
         options:{},
         dataLoaded: false,
         newIncomeTransactionDescription: '',
-        newIncomeTransactionAmount: ''
+        newIncomeTransactionAmount: '',
+
+        expenseData: [],
+        expenseChartData: {},
+        newExpenseTransactionDescription: '',
+        newExpenseTransactionAmount: ''
       }
     },
     mounted() {
@@ -62,34 +64,52 @@
         // Pie chart options
 
       };
-      this.loadIncomeChartData()
+      this.loadChartData();
     },
     methods: {
-      loadIncomeChartData(){
+      loadChartData(){
         this.$transactionService.getAll().then(transactions =>{
           var incomeTransactions = [];
+          var expenseTransactions = [];
 
           // loop through all transactions and put all income transactions into a list
           transactions.forEach(function (instance) {
             if (instance.type === "Income"){
               incomeTransactions.push(instance)
+            }else{
+              expenseTransactions.push(instance)
             }
           });
 
           // Set all income transactions
           this.incomeData = incomeTransactions;
+          // Set all expense transactions
+          this.expenseData = expenseTransactions;
 
-          let labels = this.incomeData.map(transactions => transactions.description);
-          let amounts = this.incomeData.map(transactions => transactions.amount);
-          let color = this.backgroundColor(labels.length);
+          let incomeLabels = this.incomeData.map(transactions => transactions.description);
+          let incomeAmounts = this.incomeData.map(transactions => transactions.amount);
+          let incomeColor = this.backgroundColor(incomeLabels.length);
           this.incomeChartData = {
-            labels: labels,
+            labels: incomeLabels,
             datasets: [{
               label: 'Income Transactions',
-              data: amounts,
-              backgroundColor: color
+              data: incomeAmounts,
+              backgroundColor: incomeColor
             }]
           };
+
+          let expenseLabels = this.expenseData.map(transactions => transactions.description);
+          let expenseAmounts = this.expenseData.map(transactions => transactions.amount);
+          let expenseColor = this.backgroundColor(expenseLabels.length);
+          this.expenseChartData = {
+            labels: expenseLabels,
+            datasets: [{
+              label: 'Expense Transactions',
+              data: expenseAmounts,
+              backgroundColor: expenseColor
+            }]
+          };
+
           this.dataLoaded = true
         })
       },
@@ -98,11 +118,25 @@
         if (!this.newIncomeTransactionDescription || !this.newIncomeTransactionAmount){
           alert("Enter description and amount");
         }else {
-          this.$transactionService.addIncomeTransaction({ type: "Income", description: this.newIncomeTransactionDescription, amount: this.newIncomeTransactionAmount})
+          this.$transactionService.addTransaction({ type: "Income", description: this.newIncomeTransactionDescription, amount: this.newIncomeTransactionAmount})
                   .then(response => {
                     this.newIncomeTransactionDescription = "";
                     this.newIncomeTransactionAmount = "";
-                    this.loadIncomeChartData()
+                    this.loadChartData()
+                  })
+                  .catch(err => console.error(err))
+        }
+      },
+      addExpenseTransaction(){
+        // error handling for empty boxes
+        if (!this.newExpenseTransactionDescription || !this.newExpenseTransactionAmount){
+          alert("Enter description and amount");
+        }else {
+          this.$transactionService.addTransaction({ type: "Expense", description: this.newExpenseTransactionDescription, amount: this.newExpenseTransactionAmount})
+                  .then(response => {
+                    this.newExpenseTransactionDescription = "";
+                    this.newExpenseTransactionAmount = "";
+                    this.loadChartData()
                   })
                   .catch(err => console.error(err))
         }
