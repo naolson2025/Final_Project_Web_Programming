@@ -10,15 +10,21 @@
             <IncomeGraph v-if="dataLoaded" v-bind:chartData="incomeChartData" v-bind:options="options"></IncomeGraph>
 
             <div class="input-group">
-              <input v-model.trim="newTransactionDescription" placeholder="Description">
-              <input type="number" v-model.number="newTransactionAmount" placeholder="Amount">
-              <button v-on:click="addTransaction">Add Transaction</button>
+              <input v-model.trim="newIncomeTransactionDescription" placeholder="Description">
+              <input type="number" v-model.number="newIncomeTransactionAmount" placeholder="Amount">
+              <button v-on:click="addIncomeTransaction">Add Transaction</button>
             </div>
         </div>
 
         <div class="col-md-6">
           <h2>Expenses</h2>
-          <ExpenseGraph></ExpenseGraph>
+          <ExpenseGraph v-if="dataLoaded" v-bind:chartData="incomeChartData" v-bind:options="options"></ExpenseGraph>
+
+          <div class="input-group">
+            <input v-model.trim="newIncomeTransactionDescription" placeholder="Description">
+            <input type="number" v-model.number="newIncomeTransactionAmount" placeholder="Amount">
+            <button v-on:click="addIncomeTransaction">Add Transaction</button>
+          </div>
         </div>
       </div>
     </div>
@@ -47,8 +53,8 @@
         incomeChartData: {},
         options:{},
         dataLoaded: false,
-        newTransactionDescription: '',
-        newTransactionAmount: ''
+        newIncomeTransactionDescription: '',
+        newIncomeTransactionAmount: ''
       }
     },
     mounted() {
@@ -56,12 +62,22 @@
         // Pie chart options
 
       };
-      this.loadChartData()
+      this.loadIncomeChartData()
     },
     methods: {
-      loadChartData(){
+      loadIncomeChartData(){
         this.$transactionService.getAll().then(transactions =>{
-          this.incomeData = transactions;
+          var incomeTransactions = [];
+
+          // loop through all transactions and put all income transactions into a list
+          transactions.forEach(function (instance) {
+            if (instance.type === "Income"){
+              incomeTransactions.push(instance)
+            }
+          });
+
+          // Set all income transactions
+          this.incomeData = incomeTransactions;
 
           let labels = this.incomeData.map(transactions => transactions.description);
           let amounts = this.incomeData.map(transactions => transactions.amount);
@@ -77,16 +93,16 @@
           this.dataLoaded = true
         })
       },
-      addTransaction(){
+      addIncomeTransaction(){
         // error handling for empty boxes
-        if (!this.newTransactionDescription || !this.newTransactionAmount){
+        if (!this.newIncomeTransactionDescription || !this.newIncomeTransactionAmount){
           alert("Enter description and amount");
         }else {
-          this.$transactionService.addTransaction({ description: this.newTransactionDescription, amount: this.newTransactionAmount})
+          this.$transactionService.addIncomeTransaction({ type: "Income", description: this.newIncomeTransactionDescription, amount: this.newIncomeTransactionAmount})
                   .then(response => {
-                    this.newTransactionDescription = "";
-                    this.newTransactionAmount = "";
-                    this.loadChartData()
+                    this.newIncomeTransactionDescription = "";
+                    this.newIncomeTransactionAmount = "";
+                    this.loadIncomeChartData()
                   })
                   .catch(err => console.error(err))
         }

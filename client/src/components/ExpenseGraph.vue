@@ -1,49 +1,25 @@
 <!--https://vue-chartjs.org/guide/#introduction found tutorial here-->
-<template>
-    <div class="small">
-        <pie-chart :chart-data="datacollection"></pie-chart>
-        <button @click="fillData()">Randomize</button>
-    </div>
-</template>
+<!-- No template for Chartsjs they cause problems-->
 
 <script>
-    import PieChart from './PieChart.js'
+    import { Pie, mixins } from 'vue-chartjs'
+    const { reactiveProp } = mixins;
 
     export default {
-        components: {
-            PieChart: PieChart
-        },
-        data () {
-            return {
-                datacollection: null
-            }
+        // Pie is provided by chartsjs
+        extends: Pie,
+        // mixins and reactive prop allow chart to update when data is changed
+        mixins: [ reactiveProp ],
+        props: {
+            // provided by mixins
+            options: Object
         },
         mounted () {
-            this.fillData()
-        },
-        methods: {
-            fillData () {
-                this.datacollection = {
-                    labels: [this.getRandomInt(), this.getRandomInt()],
-                    datasets: [
-                        {
-                            label: 'Data One',
-                            backgroundColor: '#f88012',
-                            data: [this.getRandomInt(), this.getRandomInt()]
-                        }
-                    ]
-                }
-            },
-            getRandomInt () {
-                return Math.floor(Math.random() * (50 - 5 + 1)) + 5
-            }
+            this.renderChart(this.chartData, this.options)
         }
     }
 </script>
 
 <style>
-    .small {
-        max-width: 600px;
-        margin:  150px auto;
-    }
+
 </style>

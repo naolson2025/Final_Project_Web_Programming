@@ -8,7 +8,7 @@ export default {
         })
     },
     // sends a patch request that will be handled by the route in transactions.js
-    addTransaction(transaction){
+    addIncomeTransaction(transaction){
         return axios.post('/api/transaction/', transaction).then(response => {
             return response.data
         })

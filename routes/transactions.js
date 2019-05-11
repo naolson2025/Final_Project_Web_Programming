@@ -4,7 +4,7 @@ var Finances = require('../models').Finances;
 
 var router = express.Router();
 
-// Not sure if transactions is correct here
+// Get all transactions from the database
 router.get('/transactions', function (req, res, next) {
     Finances.findAll({order: ['amount', 'description']})
         .then(transactions =>{
