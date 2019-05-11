@@ -1,5 +1,8 @@
 import Vue from 'vue'
 import App from './App.vue'
+import transactionService from './transactionService'
+
+Vue.prototype.$transactionService = transactionService;
 
 // import VueRouter library and this pp's routes
 import VueRouter from 'vue-router'

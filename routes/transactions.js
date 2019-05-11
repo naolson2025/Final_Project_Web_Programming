@@ -6,11 +6,19 @@ var router = express.Router();
 
 // Not sure if transactions is correct here
 router.get('/transactions', function (req, res, next) {
-    Finances.findAll({order: ['transaction']})
+    Finances.findAll({order: ['amount', 'description']})
         .then(transactions =>{
             return res.json(transactions)
         })
         .catch(err => next.err())
+});
+
+// Adding a new transaction to the pie chart
+router.post('/transaction', function (req, res, next) {
+    Finances.create(req.body).then(result =>{
+        return res.status(200).send('ok')
+    })
+    .catch(err => next(err))
 });
 
 // Not sure if this is necessary, think this loads the page for one single state, not needed for final project
