@@ -12,7 +12,11 @@
             <div class="input-group">
               <input v-model.trim="newIncomeTransactionDescription" placeholder="Description">
               <input type="number" v-model.number="newIncomeTransactionAmount" placeholder="Amount">
-              <button v-on:click="addIncomeTransaction">Add Transaction</button>
+              <button v-on:click="addIncomeTransaction">Add Transaction</button><br>
+              <div class="delete-button">
+                <input v-model.trim="deleteIncomeTransaction" placeholder="Description">
+                <button v-on:click="deleteIncTransaction">Delete Transaction</button>
+              </div>
             </div>
         </div>
 
@@ -23,7 +27,11 @@
           <div class="input-group">
             <input v-model.trim="newExpenseTransactionDescription" placeholder="Description">
             <input type="number" v-model.number="newExpenseTransactionAmount" placeholder="Amount">
-            <button v-on:click="addExpenseTransaction">Add Transaction</button>
+            <button v-on:click="addExpenseTransaction">Add Transaction</button><br>
+            <div class="delete-button">
+              <input v-model.trim="deleteExpenseTransaction" placeholder="Description">
+              <button v-on:click="deleteExpTransaction">Delete Transaction</button>
+            </div>
           </div>
         </div>
       </div>
@@ -62,7 +70,7 @@
     mounted() {
       this.options = {
         // Pie chart options
-
+        events: ['click']
       };
       this.loadChartData();
     },
@@ -88,11 +96,12 @@
 
           let incomeLabels = this.incomeData.map(transactions => transactions.description);
           let incomeAmounts = this.incomeData.map(transactions => transactions.amount);
+          let incomeID = this.incomeData.map(transactions => transactions.id);
           let incomeColor = this.backgroundColor(incomeLabels.length);
           this.incomeChartData = {
             labels: incomeLabels,
             datasets: [{
-              label: 'Income Transactions',
+              label: "Income Transactions",
               data: incomeAmounts,
               backgroundColor: incomeColor
             }]
@@ -143,6 +152,30 @@
                   .catch(err => console.error(err))
         }
       },
+      clearCharts(){
+        this.$transactionService.deleteAll({type: "Income", description: this.deleteIncomeTransaction})
+                .then(response =>{
+                  this.deleteIncomeTransaction = "";
+                  this.loadChartData()
+                })
+                .catch(err => console.error(err))
+      },
+      deleteIncTransaction(){
+        this.$transactionService.deleteTransaction({type: "Income", description: this.deleteIncomeTransaction})
+                .then(response =>{
+                  this.deleteIncomeTransaction = "";
+                  this.loadChartData()
+                })
+                .catch(err => console.error(err))
+      },
+      deleteExpTransaction(){
+        this.$transactionService.deleteTransaction({type: "Expense", description: this.deleteExpenseTransaction})
+                .then(response =>{
+                  this.deleteIncomeTransaction = "";
+                  this.loadChartData()
+                })
+                .catch(err => console.error(err))
+      },
       backgroundColor(number){
         const colors = ['#C0392B', '#E74C3C', '#9B59B6', '#8E44AD', '#2980B9', '#3498DB', '#1ABC9C', '#16A085', '#27AE60', '#2ECC71', '#F1C40F', '#F39C12', '#E67E2', '#D35400'];
 
@@ -171,5 +204,8 @@
   .input-group{
     padding-top: 50px;
     padding-bottom: 50px;
+  }
+  .delete-button{
+    padding-top: 25px;
   }
 </style>

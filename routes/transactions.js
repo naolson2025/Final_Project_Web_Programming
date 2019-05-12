@@ -20,5 +20,15 @@ router.post('/transaction', function (req, res, next) {
     })
     .catch(err => next(err))
 });
+// found on stack overflow
+router.delete('/deleteTransaction', function (req, res, next) {
+    Finances.delete({
+        description: req.params.description
+    }, function (err, transaction) {
+        if (err) return res.send(err);
+        res.json({message: 'Deleted'})
+    })
+    .catch(err => next(err))
+});
 
 module.exports = router;
