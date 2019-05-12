@@ -118,6 +118,7 @@
         if (!this.newIncomeTransactionDescription || !this.newIncomeTransactionAmount){
           alert("Enter description and amount");
         }else {
+          // add the new income transaction to the database and reload the charts
           this.$transactionService.addTransaction({ type: "Income", description: this.newIncomeTransactionDescription, amount: this.newIncomeTransactionAmount})
                   .then(response => {
                     this.newIncomeTransactionDescription = "";
@@ -132,6 +133,7 @@
         if (!this.newExpenseTransactionDescription || !this.newExpenseTransactionAmount){
           alert("Enter description and amount");
         }else {
+          // add the new expense transaction to the database and reload the charts
           this.$transactionService.addTransaction({ type: "Expense", description: this.newExpenseTransactionDescription, amount: this.newExpenseTransactionAmount})
                   .then(response => {
                     this.newExpenseTransactionDescription = "";
@@ -168,5 +170,6 @@
   }
   .input-group{
     padding-top: 50px;
+    padding-bottom: 50px;
   }
 </style>
