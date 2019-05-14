@@ -10,7 +10,7 @@ router.get('/transactions', function (req, res, next) {
         .then(transactions =>{
             return res.json(transactions)
         })
-        .catch(err => next.err())
+        .catch(err => next(err))
 });
 
 // Adding a new transaction to the pie chart
@@ -22,13 +22,17 @@ router.post('/transaction', function (req, res, next) {
 });
 // found on stack overflow
 router.delete('/deleteTransaction', function (req, res, next) {
-    Finances.delete({
-        description: req.params.description
-    }, function (err, transaction) {
-        if (err) return res.send(err);
-        res.json({message: 'Deleted'})
+    Finances.destroy({where: {description: req.query.description}}).then( result =>{
+        return res.send('ok')
     })
     .catch(err => next(err))
+});
+// removes all items from the db that have a specific type either 'Income' or 'Expense'
+router.delete('/deleteAll', function (req, res, next) {
+    Finances.destroy({where: {type: req.query.type}}).then( result =>{
+       return res.send('ok')
+   })
+   .catch(err => next(err))
 });
 
 module.exports = router;

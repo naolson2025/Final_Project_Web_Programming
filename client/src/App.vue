@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <Header></Header>
+    <button v-on:click="clearCharts">Clear Charts</button>
     <!--Creating container to put the two charts side by side-->
     <div class="container">
       <!--Both charts must be inside a single row and the columns are split 6 and 6-->
@@ -9,6 +10,7 @@
           <h2>Income</h2>
             <IncomeGraph v-if="dataLoaded" v-bind:chartData="incomeChartData" v-bind:options="options"></IncomeGraph>
 
+            <!-- Income input items for adding and deleting from the pie graphs-->
             <div class="input-group">
               <input v-model.trim="newIncomeTransactionDescription" placeholder="Description">
               <input type="number" v-model.number="newIncomeTransactionAmount" placeholder="Amount">
@@ -23,7 +25,7 @@
         <div class="col-md-6">
           <h2>Expenses</h2>
           <ExpenseGraph v-if="dataLoaded" v-bind:chartData="expenseChartData" v-bind:options="options"></ExpenseGraph>
-
+          <!-- Expense input items for adding and deleting from the pie graphs-->
           <div class="input-group">
             <input v-model.trim="newExpenseTransactionDescription" placeholder="Description">
             <input type="number" v-model.number="newExpenseTransactionAmount" placeholder="Amount">
@@ -54,6 +56,7 @@
     },
     data(){
       return {
+        // blank variables that will be loaded and processed
         incomeData: [],
         incomeChartData: {},
         options:{},
@@ -64,7 +67,10 @@
         expenseData: [],
         expenseChartData: {},
         newExpenseTransactionDescription: '',
-        newExpenseTransactionAmount: ''
+        newExpenseTransactionAmount: '',
+
+        deleteIncomeTransaction: '',
+        deleteExpenseTransaction: ''
       }
     },
     mounted() {
@@ -75,6 +81,7 @@
       this.loadChartData();
     },
     methods: {
+      // sorts through the data and loads expenses and income into two different pie graphs
       loadChartData(){
         this.$transactionService.getAll().then(transactions =>{
           var incomeTransactions = [];
@@ -96,7 +103,6 @@
 
           let incomeLabels = this.incomeData.map(transactions => transactions.description);
           let incomeAmounts = this.incomeData.map(transactions => transactions.amount);
-          let incomeID = this.incomeData.map(transactions => transactions.id);
           let incomeColor = this.backgroundColor(incomeLabels.length);
           this.incomeChartData = {
             labels: incomeLabels,
@@ -122,6 +128,7 @@
           this.dataLoaded = true
         })
       },
+      // adds an income transaction to the income pie graph
       addIncomeTransaction(){
         // error handling for empty boxes
         if (!this.newIncomeTransactionDescription || !this.newIncomeTransactionAmount){
@@ -137,6 +144,7 @@
                   .catch(err => console.error(err))
         }
       },
+      // adds an expense transaction
       addExpenseTransaction(){
         // error handling for empty boxes
         if (!this.newExpenseTransactionDescription || !this.newExpenseTransactionAmount){
@@ -152,14 +160,20 @@
                   .catch(err => console.error(err))
         }
       },
+      // clears both charts the the user can start from scratch
       clearCharts(){
-        this.$transactionService.deleteAll({type: "Income", description: this.deleteIncomeTransaction})
+        this.$transactionService.deleteAll({type: "Income"})
                 .then(response =>{
-                  this.deleteIncomeTransaction = "";
+                  this.loadChartData()
+                })
+                .catch(err => console.error(err));
+        this.$transactionService.deleteAll({type: "Expense"})
+                .then(response =>{
                   this.loadChartData()
                 })
                 .catch(err => console.error(err))
       },
+      // deletes an income transaction by description
       deleteIncTransaction(){
         this.$transactionService.deleteTransaction({type: "Income", description: this.deleteIncomeTransaction})
                 .then(response =>{
@@ -168,15 +182,18 @@
                 })
                 .catch(err => console.error(err))
       },
+      // deletes an expense transaction by description
       deleteExpTransaction(){
         this.$transactionService.deleteTransaction({type: "Expense", description: this.deleteExpenseTransaction})
                 .then(response =>{
-                  this.deleteIncomeTransaction = "";
+                  this.deleteExpenseTransaction = "";
                   this.loadChartData()
                 })
                 .catch(err => console.error(err))
       },
+      // Got from Clara
       backgroundColor(number){
+        // Colors are assigned going down the list to the slices of the pie chart
         const colors = ['#C0392B', '#E74C3C', '#9B59B6', '#8E44AD', '#2980B9', '#3498DB', '#1ABC9C', '#16A085', '#27AE60', '#2ECC71', '#F1C40F', '#F39C12', '#E67E2', '#D35400'];
 
         let chartColors = [];

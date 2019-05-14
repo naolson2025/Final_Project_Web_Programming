@@ -15,12 +15,14 @@ export default {
     },
     // sends delete request to transactions.js
     deleteTransaction(transaction){
-        return axios.delete('/api/deleteTransaction', transaction).then(response =>{
+        return axios.delete('/api/deleteTransaction', {params: transaction}).then(response =>{
             return response.data
         })
     },
     // delete all data in database
-    deleteAll(){
-
+    deleteAll(type){
+        return axios.delete('/api/deleteAll', {params: type}).then(response =>{
+            return response.data
+        })
     }
 }
